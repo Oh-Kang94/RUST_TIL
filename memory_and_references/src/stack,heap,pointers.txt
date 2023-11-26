@@ -1,0 +1,5 @@
+Rust는 메모리 관리를 무지 중요하게 여기는 언어이다.
+
+Stack보다 느린게, Heap이다,.
+Heap을 이용해서, Pointer를 통해서 위치를 알게 된다.
+책의 index 역할을 하는게 Pointer 이다.
