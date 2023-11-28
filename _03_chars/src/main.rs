@@ -25,4 +25,13 @@ fn main() {
     println!("Size of string containing '👌': {}", "👌".len());
 
     println!("Size of string containing 'a': {} {}", "aaaaaaaaaa".chars().count(), "asdsds".chars().count());
+
+    println!("\nEXEC-ex01");
+    //EXECex01 -> str 관련 iterator
+    let big_string = "Hello, I an &str";
+    big_string.chars().for_each(|c| println!("{c}"));
+    println!("Big String has {}", big_string.chars().count());
+    big_string.char_indices().for_each(|(index, chars)|{
+        println!("At index {index} is the chars {chars}");
+    })
 }

@@ -17,7 +17,7 @@
 */
 
 //EXEC01
-use std::fmt::{ Debug, Display };
+use std::fmt::{ Debug, Display, Formatter, Result };
 
 #[derive(Clone, Copy, Debug)]
 struct MyStruct {
@@ -220,6 +220,64 @@ impl Country {
     }
 }
 
+// EXEC08
+
+trait Prints {
+    // :Debug를 하게 되면, Debug 특성이 있는 애들만 가능
+    fn prints_sth(&self) where Self: Debug {
+        println!("I like to print things {:?}", self)
+    }
+
+    fn display_sth(&self) where Self: Display {
+        println!("I like to print things {}", self)
+    }
+}
+#[derive(Debug)]
+struct Person;
+
+impl Display for Person {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "Person struct")?;
+        Ok(())
+    }
+}
+
+
+#[derive(Debug)]
+struct Building;
+
+impl<T> Prints for T where T: Debug + Display {} // Debug를 impl 한 T만 가능
+
+// EXEC09
+trait Printsth {
+    fn print_sth(&self){
+        // println!("I am a {:?}", self); // 이러면 해당이 되지 않는다. 즉, Debug 속성을 부여하면 안된다.
+        /*
+            impl<T> Printsth for T where T : Debug{} 정확히 이거에 해당이 안됨
+         */
+        println!("I am sth");
+    }
+}
+
+struct PersonSilly;
+struct BuildingSilly;
+
+impl<T> Printsth for T{
+    
+}
+
+
+// EXEC10
+// AsRef
+fn print_in<T>(input: T) where T: Display{
+    println!("{input}")
+}
+
+// 이러면 숫자를 넣을 수 없음.
+fn print_str<T>(input: T) where T: Display+ AsRef<str>{
+    println!("{input}")
+}
+
 fn main() {
     println!("\nEXEC01");
     // EXEC01 ->
@@ -302,6 +360,25 @@ fn main() {
     finland.print_cities();
 
     println!("\nEXEC08");
-    // EXEC08 -> Custom Implementing Form
+    // EXEC08 -> Blanket trait impl
+    // impl a trait을 내가 원하는 타입으로 지정 가능
+    let my_person = Person;
+    let my_building = Building;
+    my_person.prints_sth();
+    my_person.display_sth();
+    let x = String::from("Hello");
+    x.prints_sth();
 
+    println!("\nEXEC09");
+    // EXEC09 -> Blanket trait impl
+    let person = PersonSilly;
+    let building = BuildingSilly;
+    person.print_sth();
+    building.print_sth();
+
+    println!("\nEXEC10");
+    // EXEC10 -> AsRef trait
+    print_in(9);
+    // print_str(9); -> str trait을 asRef했기 때문에 안된다.
+    print_str("9");
 }
