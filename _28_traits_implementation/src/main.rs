@@ -18,6 +18,7 @@
 
 //EXEC01
 use std::fmt::{ Debug, Display, Formatter, Result };
+use std::ops::Add;
 
 #[derive(Clone, Copy, Debug)]
 struct MyStruct {
@@ -33,7 +34,7 @@ fn print_as_debug<T>(input: T) where T: Debug {
 }
 
 //EXEC01
-pub trait Add {
+pub trait AddThings {
     fn add(&self, other: &Self) -> Self;
 }
 
@@ -43,7 +44,7 @@ struct ThingsToAdd {
     second: f32,
 }
 
-impl Add for ThingsToAdd {
+impl AddThings for ThingsToAdd {
     fn add(&self, other: &Self) -> Self {
         ThingsToAdd {
             first: self.first + other.first,
@@ -242,7 +243,6 @@ impl Display for Person {
     }
 }
 
-
 #[derive(Debug)]
 struct Building;
 
@@ -250,7 +250,7 @@ impl<T> Prints for T where T: Debug + Display {} // Debug를 impl 한 T만 가�
 
 // EXEC09
 trait Printsth {
-    fn print_sth(&self){
+    fn print_sth(&self) {
         // println!("I am a {:?}", self); // 이러면 해당이 되지 않는다. 즉, Debug 속성을 부여하면 안된다.
         /*
             impl<T> Printsth for T where T : Debug{} 정확히 이거에 해당이 안됨
@@ -262,20 +262,43 @@ trait Printsth {
 struct PersonSilly;
 struct BuildingSilly;
 
-impl<T> Printsth for T{
-    
-}
-
+impl<T> Printsth for T {}
 
 // EXEC10
 // AsRef
-fn print_in<T>(input: T) where T: Display{
+fn print_in<T>(input: T) where T: Display {
     println!("{input}")
 }
 
 // 이러면 숫자를 넣을 수 없음.
-fn print_str<T>(input: T) where T: Display+ AsRef<str>{
+fn print_str<T>(input: T) where T: Display + AsRef<str> {
     println!("{input}")
+}
+
+#[derive(Debug)]
+struct CountryAdd {
+    name: String,
+    pop: u32,
+    gdp: u32,
+}
+
+impl Add for CountryAdd {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self {
+            name: format!("{} and {}", self.name, other.name),
+            pop: self.pop + other.pop,
+            gdp: self.gdp + other.gdp,
+        }
+    }
+}
+
+impl CountryAdd {
+    /// Creates a new [`CountryAdd`].
+    fn new(name: &str, pop: u32, gdp: u32) -> Self {
+        Self { name: name.to_string(), pop, gdp }
+    }
 }
 
 fn main() {
@@ -381,4 +404,13 @@ fn main() {
     print_in(9);
     // print_str(9); -> str trait을 asRef했기 때문에 안된다.
     print_str("9");
+
+    println!("\nEXEC11");
+    //EXEC11 -> Add Trait
+    // https://doc.rust-lang.org/std/ops/index.html
+    let nauru = CountryAdd::new("Nauru", 10_670, 160_000_000);
+    let vanuatu = CountryAdd::new("Vanuatu", 307_815, 820_000_000);
+    let micronesia = CountryAdd::new("Micronesia", 104_468, 367_000_000);
+
+    println!("Naure + Vanuatu+ Miceonesia ={:?}", nauru + vanuatu + micronesia);
 }
